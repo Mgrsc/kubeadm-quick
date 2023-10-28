@@ -24,6 +24,8 @@ kubeadm deploy kubernetes
 9.使用docker安装 --cri-socket=unix:///var/run/cri-dockerd.sock
 ```
 
+安装calico可参考[Quickstart for Calico on Kubernetes | Calico Documentation (tigera.io)](https://docs.tigera.io/calico/latest/getting-started/kubernetes/quickstart)
+
 以下是 `kubeadm init` 命令的全部参数列表，以表格格式呈现：
 
 | 参数                            | 描述                                                         |
