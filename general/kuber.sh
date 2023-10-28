@@ -1,6 +1,7 @@
 #!/bin/bash
 set -eo pipefail
- apt-get update && apt install -y apt-transport-https ca-certificates curl gnupg lsb-release
+# apt-transport-https 可能是一个虚拟包（dummy package）；如果是的话，你可以跳过安装这个包
+apt-get install -y apt-transport-https ca-certificates curl gpg
 # Disable swap
  swapoff -a
  sed -i '/swap/ s%/swap%#/swap%g' /etc/fstab
@@ -24,9 +25,8 @@ EOF
 
 
 mkdir -p /etc/apt/keyrings/
-curl -fsSL https://dl.k8s.io/apt/doc/apt-key.gpg |  gpg --dearmor -o /etc/apt/keyrings/kubernetes-archive-keyring.gpg
-
-echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" |  tee /etc/apt/sources.list.d/kubernetes.list
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
 latest_k8s_response=$(curl -s https://api.github.com/repos/kubernetes/kubernetes/releases/latest)
 latest_k8s_version=$(echo "$latest_k8s_response" | jq -r '.tag_name')
 echo "The latest Kubernetes version is: $latest_k8s_version"
@@ -37,11 +37,6 @@ apt-get install -y kubelet=${k8s_version}* kubeadm=${k8s_version}* kubectl=${k8s
 
 apt-mark hold kubelet kubeadm kubectl
 systemctl enable --now kubelet
-
-# sed -i 's/ExecStart=\/usr\/bin\/kubelet/Environment="KUBELET_KUBECONFIG_ARGS=--bootstrap-kubeconfig=\/etc\/kubernetes\/bootstrap-kubelet.conf --kubeconfig=\/etc\/kubernetes\/kubelet.conf --cgroup-driver=cgroupfs"/' /lib/systemd/system/kubelet.service
-
-#systemctl daemon-reload && systemctl restart kubelet
-
 
 
 kubeadm config print init-defaults  > kubeadm-config.yaml
