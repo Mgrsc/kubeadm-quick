@@ -22,16 +22,14 @@ net.ipv4.ip_forward                 = 1
 EOF
  sysctl --system
 
-
-echo "The latest Kubernetes version is: $latest_k8s_version"
+latest_k8s_version=$(curl -s https://api.github.com/repos/kubernetes/kubernetes/releases/latest | jq -r '.tag_name')
+echo "The github latest Kubernetes version is: $latest_k8s_version"
 echo -e "Which version do you want to install? Please specify:"
 read -r k8s_version
 k8s_version_short=$(echo "$k8s_version" | cut -d. -f1-2)
 sudo mkdir -p /etc/apt/keyrings/
 sudo curl -fsSL https://pkgs.k8s.io/core:/stable:/v${k8s_version_short}/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v${k8s_version_short}/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list
-latest_k8s_response=$(curl -s https://api.github.com/repos/kubernetes/kubernetes/releases/latest)
-latest_k8s_version=$(echo "$latest_k8s_response" | jq -r '.tag_name')
 sudo apt-get update
 sudo apt-get install -y kubelet=${k8s_version}* kubeadm=${k8s_version}* kubectl=${k8s_version}*
 
