@@ -8,12 +8,17 @@ install_package() {
 
 # Download a file from a URL and save it locally
 download_file() {
-  local url="$1"     # URL of file to download
-  local dest="$2"    # Local destination of the file
-  if [ ! -f "${dest}" ]; then  # If file does not exist locally, download it
-    wget -q "${url}" -O "${dest}"
+  local url="$1"    
+  local dest="$2"    
+  local temp="${dest}.temp"
+  wget -c "${url}" -O "${temp}" 
+  if [ $? -ne 0 ]; then
+    rm "${temp}"
+    exit 1
   fi
+  mv "${temp}" "${dest}"
 }
+
 
 # Remove a local file
 remove_file() {
