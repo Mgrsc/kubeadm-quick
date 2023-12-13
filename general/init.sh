@@ -4,7 +4,7 @@
 apt update -y && apt upgrade -y
 
 # 安装常用工具和软件包
-apt install wget curl sudo python3 python3-pip -y
+apt install wget curl sudo python3 python3-pip jq -y
 
 # 禁用IPv6
 echo "net.ipv6.conf.all.disable_ipv6 = 1" >> /etc/sysctl.conf && sysctl -p
