@@ -52,3 +52,50 @@ kubeadm deploy kubernetes
 | `--skip-token-print`            | 不要打印生成的加入令牌                                       |
 | `--v` / `-v`                    | 设置日志级别                                                 |
 | `--dry-run`                     | 执行初始化步骤的仿真运行，但不进行任何实际更改               |
+
+kubeadm-config.yaml
+
+```yaml
+apiVersion: kubeadm.k8s.io/v1beta3  # Kubernetes API版本
+bootstrapTokens:  # 引导令牌配置
+  - groups:
+    - system:bootstrappers:kubeadm:default-node-token
+    token: abcdef.0123456789abcdef  # 令牌值
+    ttl: 24h0m0s  # 令牌过期时间
+    usages:
+    - signing
+    - authentication  # 用途包括签名和认证
+kind: InitConfiguration  # 初始化配置类型
+localAPIEndpoint:  # 本地API终端配置
+  advertiseAddress: 1.2.3.4  # 广告地址
+  bindPort: 6443  # 绑定端口
+nodeRegistration:  # 节点注册配置
+  criSocket: unix:///var/run/containerd/containerd.sock  # 容器运行时套接字
+  imagePullPolicy: IfNotPresent  # 镜像拉取策略
+  name: node  # 节点名称
+  taints: null  # 污点配置为空
+
+apiServer:  # API服务器配置
+  timeoutForControlPlane: 4m0s  # 控制平面超时时间
+apiVersion: kubeadm.k8s.io/v1beta3  # Kubernetes API版本
+certificatesDir: /etc/kubernetes/pki  # 证书存储目录
+clusterName: kubernetes  # 集群名称
+controllerManager: {}  # 控制器管理器配置为空
+dns: {}  # DNS配置为空
+etcd:  # etcd配置
+  local:
+    dataDir: /var/lib/etcd  # etcd数据目录
+imageRepository: registry.k8s.io  # 镜像仓库地址
+kind: ClusterConfiguration  # 集群配置类型
+kubernetesVersion: 1.28.0  # Kubernetes版本
+networking:  # 网络配置
+  dnsDomain: cluster.local  # DNS域名
+  serviceSubnet: 10.96.0.0/12  # 服务子网
+scheduler: {}  # 调度器配置为空
+
+```
+
+
+
+
+
